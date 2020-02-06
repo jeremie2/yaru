@@ -1,0 +1,7 @@
+<gresources>
+  <gresource prefix="/com/ubuntu/themes/@VARIANT@/@GTKVER@">
+    <file alias="gtk.css">@VARIANT@-gtk-@GTKVER@-generated.css</file>
+    <file alias="gtk-dark.css">@VARIANT@-gtk-dark-@GTKVER@-generated.css</file>
+    @ASSETS@
+  </gresource>
+</gresources>
