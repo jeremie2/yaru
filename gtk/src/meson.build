@@ -3,15 +3,22 @@ sassc = find_program('sassc')
 
 variants = []
 foreach variant: ['default', 'dark', 'light']
-  if get_option(variant)
-    variants += variant
+  if not get_option(variant)
+    message('skip variant ' + variant)
+    continue
   endif
+  variants += variant
 endforeach
 
 foreach variant: variants
   message('build variant ' + variant)
 
-  theme_name = meson.project_name() + '-' + variant
+  if variant == 'default'
+    theme_name = meson.project_name()
+  else
+    theme_name = meson.project_name() + '-' + variant
+  endif
+
   theme_dir = join_paths(get_option('datadir'), 'themes', theme_name)
 
   # generate index.theme from template
@@ -22,8 +29,6 @@ foreach variant: variants
     output: theme_name + '-index.theme',
     configuration: conf_data,
     install_dir: theme_dir)
-
-  subdir(join_paths('flavours', variant))
 
   foreach gtkver: ['3.20', '3.0']
     gtk3_scss_dependencies = []
