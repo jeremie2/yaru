@@ -1,6 +1,7 @@
 gnome = import('gnome')
 sassc = find_program('sassc')
 
+# TODO rename variants to flavours
 variants = []
 foreach variant: ['default', 'dark', 'light']
   if not get_option(variant)
@@ -21,6 +22,7 @@ foreach variant: variants
 
   theme_dir = join_paths(get_option('datadir'), 'themes', theme_name)
 
+
   # generate index.theme from template
   conf_data = configuration_data()
   conf_data.set('ThemeName', theme_name)
@@ -30,6 +32,8 @@ foreach variant: variants
     configuration: conf_data,
     install_dir: theme_dir)
 
+  subdir(join_paths('flavours', variant))
+
   foreach gtkver: ['3.20', '3.0']
     gtk3_scss_dependencies = []
     sources_relative_path = join_paths('flavours', variant, 'gtk-' + gtkver)
@@ -38,6 +42,7 @@ foreach variant: variants
     generated_css = []
     foreach f : [ 'gtk', 'gtk-dark' ]
       gtk_sass_path = join_paths(sources_relative_path, f)
+      # TODO review name generation (this doesn't seem really clear)
       target_name = '@0@-@1@-@2@-generated'.format(theme_name, f, gtkver)
       generated_css_out = '@0@-@1@-@2@-generated.css'.format(theme_name, f, gtkver)
 

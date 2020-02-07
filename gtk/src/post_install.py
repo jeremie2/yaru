@@ -14,10 +14,13 @@ flavours = sys.argv[3:]
 themes_dir = path.join(PREFIX, data_dir, 'themes')
 
 for f in flavours:
-    flavour_name = "{project}-{flavour}".format(project=project_name, flavour=f)
+    if f == 'default':
+        flavour_name = project_name
+    else:
+        flavour_name = "{project}-{flavour}".format(project=project_name, flavour=f)
 
     # rename index.theme
-    theme_index_name = "{project}-{flavour}-index.theme".format(project=project_name, flavour=f)
+    theme_index_name = flavour_name + "-index.theme"
     theme_index_src = path.join(themes_dir, flavour_name, theme_index_name)
 
     print('searching ', theme_index_src)
@@ -30,7 +33,7 @@ for f in flavours:
 
     # rename gresource, gtk.css and gtk-dark.css
     for gtkver in ['3.20', '3.0']:
-        theme_gresource = "{project}-{flavour}-gtk-{ver}.gresource".format(project=project_name, flavour=f, ver=gtkver)
+        theme_gresource = flavour_name + "-gtk-{ver}.gresource".format(ver=gtkver)
         theme_gresource_src = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, theme_gresource)
 
         print('searching ', theme_gresource_src)
@@ -40,7 +43,7 @@ for f in flavours:
             move(theme_gresource_src, theme_gresource_dst)
 
         for variant in ['', '-dark']:
-            theme_gtk_css = "{project}-{flavour}-gtk-{ver}{variant}.css".format(project=project_name, flavour=f, ver=gtkver, variant=variant)
+            theme_gtk_css = flavour_name + "-gtk-{ver}{variant}.css".format(ver=gtkver, variant=variant)
             theme_gtk_css_src = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, theme_gtk_css)
 
             print('searching ', theme_gtk_css_src)
