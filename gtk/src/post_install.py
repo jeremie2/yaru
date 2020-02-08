@@ -43,7 +43,7 @@ for f in flavours:
             move(theme_gresource_src, theme_gresource_dst)
 
         for variant in ['', '-dark']:
-            theme_gtk_css = flavour_name + "-gtk-{ver}{variant}.css".format(ver=gtkver, variant=variant)
+            theme_gtk_css = flavour_name + "-gtk{variant}-{ver}-generated.css".format(ver=gtkver, variant=variant)
             theme_gtk_css_src = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, theme_gtk_css)
 
             print('searching ', theme_gtk_css_src)
