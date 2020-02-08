@@ -37,6 +37,8 @@ foreach flavour: flavours
   foreach gtkver: ['3.0', '3.20']
     gtk3_assets = []
     gtk3_scss_dependencies = []
+
+    # load gtk3 scss and assets from subdirs
     subdir(join_paths('flavours', flavour, 'gtk-' + gtkver))
 
     sources_relative_path = join_paths('flavours', flavour, 'gtk-' + gtkver)
