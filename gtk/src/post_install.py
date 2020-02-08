@@ -23,33 +23,23 @@ for f in flavours:
     theme_index_name = flavour_name + "-index.theme"
     theme_index_src = path.join(themes_dir, flavour_name, theme_index_name)
 
-    print('searching ', theme_index_src)
+    # print('searching ', theme_index_src)
     if path.exists(theme_index_src):
         theme_index_dst = path.join(themes_dir, flavour_name, 'index.theme')
-
-        print('Replace %s with %s' % (theme_index_src, theme_index_dst))
+        # print('Replace %s with %s' % (theme_index_src, theme_index_dst))
         move(theme_index_src, theme_index_dst)
 
 
     # rename gresource, gtk.css and gtk-dark.css
     for gtkver in ['3.20', '3.0']:
-        theme_gresource = flavour_name + "-gtk-{ver}.gresource".format(ver=gtkver)
-        theme_gresource_src = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, theme_gresource)
-
-        print('searching ', theme_gresource_src)
-        if path.exists(theme_gresource_src):
-            theme_gresource_dst = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, 'gtk.gresource')
-            print('Replace %s with %s' % (theme_gresource_src, theme_gresource_dst))
-            move(theme_gresource_src, theme_gresource_dst)
-
         for variant in ['', '-dark']:
             theme_gtk_css = flavour_name + "-gtk{variant}-{ver}-generated.css".format(ver=gtkver, variant=variant)
             theme_gtk_css_src = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, theme_gtk_css)
 
-            print('searching ', theme_gtk_css_src)
+            # print('searching ', theme_gtk_css_src)
             if path.exists(theme_gtk_css_src):
                 theme_gtk_css_dst = path.join(themes_dir, flavour_name, 'gtk-' + gtkver, 'gtk{variant}.css'.format(variant=variant))
-                print('Replace %s with %s' % (theme_gtk_css_src, theme_gtk_css_dst))
+                # print('Replace %s with %s' % (theme_gtk_css_src, theme_gtk_css_dst))
                 move(theme_gtk_css_src, theme_gtk_css_dst)
 
 

@@ -32,36 +32,39 @@ foreach variant: variants
     configuration: conf_data,
     install_dir: theme_dir)
 
-  subdir(join_paths('flavours', variant))
+  subdir(join_paths('flavours', variant, 'gtk-2.0'))
 
-  foreach gtkver: ['3.20', '3.0']
-    gtk3_scss_dependencies = []
+  foreach gtkver: ['3.0', '3.20']
     sources_relative_path = join_paths('flavours', variant, 'gtk-' + gtkver)
 
-    generated_css = []
+    gtk3_scss = run_command('cat',
+      files(join_paths(sources_relative_path, 'meson-scss.list'))).stdout().split()
+    gtk3_scss_dependencies = []
+    foreach f: gtk3_scss
+      gtk3_scss_dependencies += join_paths('flavours', variant, 'gtk-' + gtkver, f)
+    endforeach
+
     foreach f : [ 'gtk', 'gtk-dark' ]
-
-      gtk_sass_path = join_paths(sources_relative_path, f)
-
-      # TODO review name generation (this doesn't seem really clear)
       target_name = '@0@-@1@-@2@-generated'.format(theme_name, f, gtkver)
+      gtk_sass_path = join_paths(sources_relative_path, f)
 
       custom_target(target_name,
         input: gtk_sass_path + '.scss',
-        output: target_name + '.scss',
+        output: target_name + '.css',
         depend_files: files(gtk3_scss_dependencies),
         command: [sassc, '-a', '@INPUT@', '@OUTPUT@'],
         install: true,
-        install_dir: join_paths(theme_dir, 'gtk-' + gtkver)
-        )
+        install_dir: join_paths(theme_dir, 'gtk-' + gtkver))
     endforeach
 
-    gtk3_assets = run_command('cat', files(join_paths(sources_relative_path, 'meson-assets.list'))).stdout().split()
-    assets_relative_path = []
-    foreach f : gtk3_assets
-      assets_relative_path += join_paths('flavours', variant, 'gtk-' + gtkver, f)
+    assets_relative_path = run_command('cat',
+      files(join_paths(sources_relative_path, 'meson-assets.list'))).stdout().split()
+    gtk3_assets = []
+    foreach f : assets_relative_path
+      gtk3_assets += join_paths('flavours', variant, 'gtk-' + gtkver, f)
     endforeach
-    install_data(assets_relative_path, install_dir: join_paths(theme_dir, 'gtk-' + gtkver, 'assets'))
+
+    install_data(gtk3_assets, install_dir: join_paths(theme_dir, 'gtk-' + gtkver, 'assets'))
 
   endforeach
 endforeach
