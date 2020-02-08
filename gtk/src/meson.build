@@ -22,28 +22,24 @@ foreach variant: variants
 
   theme_dir = join_paths(get_option('datadir'), 'themes', theme_name)
 
-
-  # generate index.theme from template
   conf_data = configuration_data()
   conf_data.set('ThemeName', theme_name)
   conf_data.set('VariantThemeName', theme_name)
-  configure_file(input: './common/index.theme.in',
+  configure_file(input: 'index.theme.in',
     output: theme_name + '-index.theme',
     configuration: conf_data,
     install_dir: theme_dir)
 
+  # install gtk2 data
   subdir(join_paths('flavours', variant, 'gtk-2.0'))
 
+  # build and install gtk3 data
   foreach gtkver: ['3.0', '3.20']
-    sources_relative_path = join_paths('flavours', variant, 'gtk-' + gtkver)
-
-    gtk3_scss = run_command('cat',
-      files(join_paths(sources_relative_path, 'meson-scss.list'))).stdout().split()
+    gtk3_assets = []
     gtk3_scss_dependencies = []
-    foreach f: gtk3_scss
-      gtk3_scss_dependencies += join_paths('flavours', variant, 'gtk-' + gtkver, f)
-    endforeach
+    subdir(join_paths('flavours', variant, 'gtk-' + gtkver))
 
+    sources_relative_path = join_paths('flavours', variant, 'gtk-' + gtkver)
     foreach f : [ 'gtk', 'gtk-dark' ]
       target_name = '@0@-@1@-@2@-generated'.format(theme_name, f, gtkver)
       gtk_sass_path = join_paths(sources_relative_path, f)
@@ -55,13 +51,6 @@ foreach variant: variants
         command: [sassc, '-a', '@INPUT@', '@OUTPUT@'],
         install: true,
         install_dir: join_paths(theme_dir, 'gtk-' + gtkver))
-    endforeach
-
-    assets_relative_path = run_command('cat',
-      files(join_paths(sources_relative_path, 'meson-assets.list'))).stdout().split()
-    gtk3_assets = []
-    foreach f : assets_relative_path
-      gtk3_assets += join_paths('flavours', variant, 'gtk-' + gtkver, f)
     endforeach
 
     install_data(gtk3_assets, install_dir: join_paths(theme_dir, 'gtk-' + gtkver, 'assets'))
