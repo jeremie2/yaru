@@ -2,44 +2,45 @@ gnome = import('gnome')
 sassc = find_program('sassc')
 
 # TODO rename variants to flavours
-variants = []
-foreach variant: ['default', 'dark', 'light']
-  if not get_option(variant)
-    message('skip variant ' + variant)
+flavours = []
+foreach flavour: ['default', 'dark', 'light']
+  if not get_option(flavour)
+    message('skip flavour ' + flavour)
     continue
   endif
-  variants += variant
+  flavours += flavour
 endforeach
 
-foreach variant: variants
-  message('build variant ' + variant)
+foreach flavour: flavours
+  message('build flavour ' + flavour)
 
-  if variant == 'default'
+  # default flavour is just Yaru
+  if flavour == 'default'
     theme_name = meson.project_name()
   else
-    theme_name = meson.project_name() + '-' + variant
+    theme_name = meson.project_name() + '-' + flavour
   endif
 
   theme_dir = join_paths(get_option('datadir'), 'themes', theme_name)
 
   conf_data = configuration_data()
   conf_data.set('ThemeName', theme_name)
-  conf_data.set('VariantThemeName', theme_name)
+  conf_data.set('FlavourThemeName', theme_name)
   configure_file(input: 'index.theme.in',
     output: theme_name + '-index.theme',
     configuration: conf_data,
     install_dir: theme_dir)
 
   # install gtk2 data
-  subdir(join_paths('flavours', variant, 'gtk-2.0'))
+  subdir(join_paths('flavours', flavour, 'gtk-2.0'))
 
   # build and install gtk3 data
   foreach gtkver: ['3.0', '3.20']
     gtk3_assets = []
     gtk3_scss_dependencies = []
-    subdir(join_paths('flavours', variant, 'gtk-' + gtkver))
+    subdir(join_paths('flavours', flavour, 'gtk-' + gtkver))
 
-    sources_relative_path = join_paths('flavours', variant, 'gtk-' + gtkver)
+    sources_relative_path = join_paths('flavours', flavour, 'gtk-' + gtkver)
     foreach f : [ 'gtk', 'gtk-dark' ]
       target_name = '@0@-@1@-@2@-generated'.format(theme_name, f, gtkver)
       gtk_sass_path = join_paths(sources_relative_path, f)
@@ -58,4 +59,4 @@ foreach variant: variants
   endforeach
 endforeach
 
-meson.add_install_script('post_install.py', get_option('datadir'), meson.project_name(), variants)
+meson.add_install_script('post_install.py', get_option('datadir'), meson.project_name(), flavours)
