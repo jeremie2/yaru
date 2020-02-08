@@ -1,7 +1,6 @@
 gnome = import('gnome')
 sassc = find_program('sassc')
 
-# TODO rename variants to flavours
 flavours = []
 foreach flavour: ['default', 'dark', 'light']
   if not get_option(flavour)
