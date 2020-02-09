@@ -1,19 +1,10 @@
 gnome = import('gnome')
 sassc = find_program('sassc')
 
-flavours = []
-foreach flavour: ['default', 'dark', 'light']
-  if not get_option(flavour)
-    message('skip flavour ' + flavour)
-    continue
-  endif
-  flavours += flavour
-endforeach
-
 foreach flavour: flavours
   message('build flavour ' + flavour)
 
-  # default flavour is just Yaru
+  # default flavour theme_name is just Yaru
   if flavour == 'default'
     theme_name = meson.project_name()
   else
@@ -30,21 +21,26 @@ foreach flavour: flavours
     configuration: conf_data,
     install_dir: theme_dir)
 
+  # install unity assets
+  if flavour == 'default' and get_option('ubuntu-unity')
+    subdir(join_paths('flavours', 'default', 'unity'))
+  endif
+
   # install gtk2 data
   subdir(join_paths('flavours', flavour, 'gtk-2.0'))
 
   # build and install gtk3 data
   foreach gtkver: ['3.0', '3.20']
+    # load gtk3 scss and assets from subdirs
     gtk3_assets = []
     gtk3_scss_dependencies = []
-
-    # load gtk3 scss and assets from subdirs
     subdir(join_paths('flavours', flavour, 'gtk-' + gtkver))
 
     sources_relative_path = join_paths('flavours', flavour, 'gtk-' + gtkver)
-    foreach f : [ 'gtk', 'gtk-dark' ]
-      target_name = '@0@-@1@-@2@-generated'.format(theme_name, f, gtkver)
-      gtk_sass_path = join_paths(sources_relative_path, f)
+
+    foreach variant : [ 'gtk', 'gtk-dark' ]
+      target_name = '@0@-@1@-@2@-generated'.format(theme_name, variant, gtkver)
+      gtk_sass_path = join_paths(sources_relative_path, variant)
 
       custom_target(target_name,
         input: gtk_sass_path + '.scss',
